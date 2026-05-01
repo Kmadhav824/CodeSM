@@ -21,6 +21,8 @@ export function useInterviewSession() {
     const [interviewRound, setInterviewRound] = useState('technical');
     const [codingLanguage, setCodingLanguage] = useState(INTERVIEW_CODE_LANGUAGES[0].id);
     const [customRequirements, setCustomRequirements] = useState('');
+    const [resumeText, setResumeText] = useState('');
+    const [isResumeParsing, setIsResumeParsing] = useState(false);
     const [startError, setStartError] = useState('');
     const [currentPage, setCurrentPage] = useState('selection');
     const [isLoading, setIsLoading] = useState(false);
@@ -133,6 +135,7 @@ export function useInterviewSession() {
                 role: selectedRoleData?.name || selectedRole,
                 experience: selectedExperienceData?.name || selectedExperience,
                 customRequirements,
+                ...(resumeText.trim() ? { resumeContext: resumeText.trim() } : {}),
                 questionCount,
                 interviewLevel,
                 round: interviewRound,
@@ -305,6 +308,7 @@ export function useInterviewSession() {
         setInterviewRound('technical');
         setCodingLanguage(INTERVIEW_CODE_LANGUAGES[0].id);
         setCustomRequirements('');
+        setResumeText('');
     }, [stopAllInterviewSideEffects, stopInterviewMediaStream]);
 
     useEffect(() => {
@@ -433,6 +437,11 @@ export function useInterviewSession() {
         setCodingLanguage,
         customRequirements,
         setCustomRequirements,
+        resumeText,
+        onResumeParsed: ({ text }) => setResumeText(text),
+        onResumeClear: () => setResumeText(''),
+        isResumeParsing,
+        setIsResumeParsing,
         selectionComplete,
         startError,
         currentPage,
