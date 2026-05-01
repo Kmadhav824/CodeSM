@@ -56,6 +56,7 @@ async function generateQuestions(
         role,
         experience,
         customRequirements,
+        resumeContext,
         questionCount,
         interviewLevel,
         round,
@@ -70,6 +71,12 @@ async function generateQuestions(
             ? `\nPROGRAMMING LANGUAGE: The candidate selected "${codingLanguage}" for their editor. Phrase each question so a solution is naturally written in that language (syntax may vary; keep the problem language-agnostic but mention they may implement in ${codingLanguage}).`
             : '';
 
+    // Build the resume section only when provided; cap defensively to avoid runaway tokens.
+    const MAX_RESUME_CHARS = 3500;
+    const resumeLine = resumeContext?.trim()
+        ? `\nCANDIDATE RESUME PROFILE:\n${resumeContext.slice(0, MAX_RESUME_CHARS)}\n\nIMPORTANT: Use the resume profile above to personalise the questions. Reference specific technologies, projects, or experiences mentioned. Prioritise gaps or depth opportunities visible in the resume.`
+        : '';
+
     const prompt = `
 You are an expert interviewer for software development roles. Generate a set of high-quality interview questions tailored to the candidate's role, experience, round type, and difficulty.
 
@@ -83,6 +90,7 @@ ROUND AND LEVEL:
 ${roundLine}
 ${levelLine}
 ${langLine}
+${resumeLine}
 
 CUSTOM REQUIREMENTS FROM CANDIDATE:
 ${customRequirements?.trim() ? customRequirements : "No extra requirements provided."}
@@ -92,6 +100,7 @@ INSTRUCTIONS:
 - Every question must fit the selected round type above; do not blend unrelated round types.
 - Calibrate depth to the experience level and the interview level (${interviewLevel}).
 - Prioritize custom requirements when provided.
+- When a resume profile is present, tailor at least half the questions to the candidate's actual experience, tech stack, or projects from their resume.
 - Avoid generic filler; be specific and practical for the role.
 - Do not repeat questions. Do not include answers.
 
