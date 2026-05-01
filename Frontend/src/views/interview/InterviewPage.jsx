@@ -88,6 +88,7 @@ const InterviewAssistant = () => {
                 customRequirements={session.customRequirements}
                 codingLanguageName={codingLanguageName}
                 isCodeRound={roundUsesCodeEditor(session.interviewRound)}
+                resumeText={session.resumeText}
                 isLoading={session.isLoading}
                 startError={session.startError}
                 onGoBack={session.goBackToSelection}
@@ -118,6 +119,11 @@ const InterviewAssistant = () => {
             setCodingLanguage={session.setCodingLanguage}
             customRequirements={session.customRequirements}
             setCustomRequirements={session.setCustomRequirements}
+            resumeText={session.resumeText}
+            onResumeParsed={session.onResumeParsed}
+            onResumeClear={session.onResumeClear}
+            isResumeParsing={session.isResumeParsing}
+            setIsResumeParsing={session.setIsResumeParsing}
             isLoading={session.isLoading}
             selectionComplete={session.selectionComplete}
             onContinue={session.goToReady}
