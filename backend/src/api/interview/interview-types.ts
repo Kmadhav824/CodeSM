@@ -2,6 +2,8 @@ export interface createInterviewQuestion {
   role:string;
   experience:string;
   customRequirements?:string;
+  /** Cleaned plain-text extracted from the candidate's resume (client-side). */
+  resumeContext?:string;
   questionCount:number;
   interviewLevel:string;
   round:string;

@@ -9,11 +9,13 @@ export function InterviewReadyStep({
     customRequirements,
     codingLanguageName,
     isCodeRound,
+    resumeText,
     isLoading,
     startError,
     onGoBack,
     onStartInterview,
 }) {
+    const hasResume = Boolean(resumeText && resumeText.trim());
     return (
         <div className="bg-background text-foreground min-h-screen p-8 flex flex-col items-center justify-center space-y-10">
             <div className="text-center space-y-4 max-w-lg">
@@ -45,6 +47,12 @@ export function InterviewReadyStep({
                     <p className="text-sm text-muted-foreground">
                         <span className="text-foreground font-medium">Focus:</span> {customRequirements}
                     </p>
+                )}
+                {hasResume && (
+                    <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/[0.08] px-3 py-1 text-xs text-emerald-300 font-medium">
+                        <span>✅</span>
+                        Resume loaded — questions will be tailored to your profile
+                    </div>
                 )}
                 <button
                     type="button"

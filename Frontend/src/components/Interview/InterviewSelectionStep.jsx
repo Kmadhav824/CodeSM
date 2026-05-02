@@ -1,5 +1,6 @@
 import React from 'react';
 import { roundUsesCodeEditor } from './interviewConstants';
+import { ResumeUploadField } from './ResumeUploadField';
 
 const controlBase =
     'w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3.5 text-sm text-gray-100 shadow-sm backdrop-blur-xl transition-all duration-300 outline-none hover:bg-white/[0.06] hover:border-white/20';
@@ -95,6 +96,11 @@ export function InterviewSelectionStep({
     setCodingLanguage,
     customRequirements,
     setCustomRequirements,
+    resumeText,
+    onResumeParsed,
+    onResumeClear,
+    isResumeParsing,
+    setIsResumeParsing,
     isLoading,
     selectionComplete,
     onContinue,
@@ -272,6 +278,23 @@ export function InterviewSelectionStep({
                                 </div>
                             </section>
 
+                            {/* Resume Section */}
+                            <section className="relative">
+                                <SectionHeader
+                                    title="Resume"
+                                    subtitle="Upload your resume for personalised questions (optional)"
+                                />
+                                <div className="bg-white/[0.015] border border-white/[0.03] rounded-[24px] p-5 sm:p-7 transition-colors duration-300 hover:bg-white/[0.025]">
+                                    <ResumeUploadField
+                                        resumeText={resumeText}
+                                        onParsed={onResumeParsed}
+                                        onClear={onResumeClear}
+                                        isParsing={isResumeParsing}
+                                        setIsParsing={setIsResumeParsing}
+                                    />
+                                </div>
+                            </section>
+
                             {/* Focus Areas Section */}
                             <section className="relative">
                                 <SectionHeader 
@@ -283,7 +306,7 @@ export function InterviewSelectionStep({
                                         id="custom-req"
                                         icon="✨"
                                         label="Focus Areas"
-                                        hint="e.g. System design tradeoffs, React hooks, conflict resolution."
+                                        hint="e.g. System design tradeoffs, React hooks, conflict resolution. Leave blank — the AI will draw from your resume."
                                     >
                                         <textarea
                                             id="custom-req"
