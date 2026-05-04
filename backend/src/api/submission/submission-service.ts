@@ -2,7 +2,7 @@ import { IGetSubmissionResponse, IGetSubmissionResultsResponse } from './submiss
 import { submission, executionResult, user, problem } from '../../db/schema';
 import { db } from '../../loaders/postgres';
 import redis from '../../loaders/redis';
-import { eq, and, desc } from 'drizzle-orm';
+import { eq, and, desc, count, sql } from 'drizzle-orm';
 import ApiError from '../../utils/ApiError';
 import httpStatus from 'http-status';
 import { createRunQueue, createSubmitQueue } from './submission-helper';
@@ -192,6 +192,95 @@ export const handleGetSubmissionResults = async (
         } as IGetSubmissionResultsResponse;
     }
 }
+
+export const handleGetUserDashboardStats = async (userId: string) => {
+    try {
+        // Recent submissions (last 20 across all problems)
+        const recentSubs = await db
+            .select({
+                id: submission.id,
+                language: submission.language,
+                status: submission.status,
+                verdict: executionResult.verdict,
+                timeTaken: submission.timeTaken,
+                memoryTaken: submission.memoryTaken,
+                createdAt: submission.createdAt,
+                problemId: submission.problemId,
+                problemTitle: problem.title,
+                problemSlug: problem.slug,
+                problemDifficulty: problem.difficulty,
+            })
+            .from(submission)
+            .leftJoin(executionResult, eq(executionResult.submissionId, submission.id))
+            .leftJoin(problem, eq(problem.id, submission.problemId))
+            .where(and(eq(submission.userId, userId), eq(submission.mode, 'SUBMIT')))
+            .orderBy(desc(submission.createdAt))
+            .limit(20);
+
+        // Total submissions count
+        const [totalRow] = await db
+            .select({ count: count() })
+            .from(submission)
+            .where(and(eq(submission.userId, userId), eq(submission.mode, 'SUBMIT')));
+
+        // Accepted problems (distinct problems with ACCEPTED verdict)
+        const acceptedProblems = await db
+            .selectDistinct({ problemId: submission.problemId })
+            .from(submission)
+            .innerJoin(executionResult, eq(executionResult.submissionId, submission.id))
+            .where(and(
+                eq(submission.userId, userId),
+                eq(submission.mode, 'SUBMIT'),
+                eq(executionResult.verdict, 'ACCEPTED')
+            ));
+
+        // Group accepted by difficulty
+        const acceptedWithDiff = await db
+            .selectDistinct({ problemId: submission.problemId, difficulty: problem.difficulty })
+            .from(submission)
+            .innerJoin(executionResult, eq(executionResult.submissionId, submission.id))
+            .innerJoin(problem, eq(problem.id, submission.problemId))
+            .where(and(
+                eq(submission.userId, userId),
+                eq(submission.mode, 'SUBMIT'),
+                eq(executionResult.verdict, 'ACCEPTED')
+            ));
+
+        const easyCount   = acceptedWithDiff.filter(r => r.difficulty === 'EASY').length;
+        const mediumCount = acceptedWithDiff.filter(r => r.difficulty === 'MEDIUM').length;
+        const hardCount   = acceptedWithDiff.filter(r => r.difficulty === 'HARD').length;
+
+        const formatted = recentSubs.map(r => ({
+            id: r.id,
+            language: r.language,
+            status: r.verdict && r.verdict !== 'PENDING' ? r.verdict : r.status,
+            timeTaken: r.timeTaken,
+            memoryTaken: r.memoryTaken,
+            createdAt: r.createdAt,
+            problem: {
+                id: r.problemId,
+                title: r.problemTitle,
+                slug: r.problemSlug,
+                difficulty: r.problemDifficulty,
+            },
+        }));
+
+        return {
+            totalSubmissions: totalRow?.count ?? 0,
+            totalSolved: acceptedProblems.length,
+            solvedByDifficulty: { easy: easyCount, medium: mediumCount, hard: hardCount },
+            recentSubmissions: formatted,
+        };
+    } catch (error) {
+        console.error('Dashboard stats error:', error);
+        return {
+            totalSubmissions: 0,
+            totalSolved: 0,
+            solvedByDifficulty: { easy: 0, medium: 0, hard: 0 },
+            recentSubmissions: [],
+        };
+    }
+};
 
 export const handleGetAllSubmissions = async (userId: string, problemId: string) => {
     try {
