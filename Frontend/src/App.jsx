@@ -5,6 +5,7 @@ import LoginCard from "./views/auth/login/page";
 import SignUpCard from "./views/auth/signup/page";
 import ProblemPage from "./views/problemPage/ProblemPage";
 import Dashboard from "./views/dashboard/DashBoard";
+import UserDashboard from "./views/dashboard/UserDashboard";
 import Problems from "./views/problems/problems";
 import NewProblem from "./views/newProblem/NewProblem";
 import ContestListPage from "./views/contest/ContestListPage";
@@ -38,6 +39,14 @@ export default function App() {
 
           <Route element={<Layout />}>
             <Route path="/" element={<Dashboard />} />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <UserDashboard />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/problems" element={<Problems />} />
             <Route path="/problems/:id" element={<ProblemPage />} />
             <Route
