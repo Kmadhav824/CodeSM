@@ -1,10 +1,11 @@
 import { Router } from "express";
 import { validate, verifyJWT } from "../../shared/middleware";
 import { createSubmissionSchema } from "./submission-schema";
-import { createSubmission, getSubmissionStatus, getSubmissionResults, getAllSubmissions } from "./submission-controller";
+import { createSubmission, getSubmissionStatus, getSubmissionResults, getAllSubmissions, getUserDashboardStats } from "./submission-controller";
 
 const router = Router();
 
+router.get("/user/dashboard", verifyJWT, getUserDashboardStats);
 router.get("/problem/:problemId", verifyJWT, getAllSubmissions);
 router.get("/:submissionId", verifyJWT, getSubmissionStatus);
 router.get("/:submissionId/result", verifyJWT, getSubmissionResults);

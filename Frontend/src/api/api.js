@@ -198,4 +198,8 @@ export const getCurrentUser = () => {
     withCredentials: true,
   });
 }
-
+export const getUserDashboardStats = () => {
+  return axios.get(`${BASE}/submission/user/dashboard`, {
+    withCredentials: true,
+  });
+};
