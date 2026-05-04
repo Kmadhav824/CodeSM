@@ -1,7 +1,7 @@
 import asyncHandler from "../../utils/asyncHandler";
 import { jwtReq } from "../../types";
 import { Response } from "express";
-import { handleCreateSubmission, handlegetSubmissionStatus, handleGetSubmissionResults, handleGetAllSubmissions } from "./submission-service";
+import { handleCreateSubmission, handlegetSubmissionStatus, handleGetSubmissionResults, handleGetAllSubmissions, handleGetUserDashboardStats } from "./submission-service";
 
 export const createSubmission = asyncHandler(async (req: jwtReq, res: Response) => {
     const { problemId, mode } = req.params;
@@ -50,3 +50,12 @@ export const getAllSubmissions = asyncHandler(async (req: jwtReq, res: Response)
         message: response
     })
 })
+
+export const getUserDashboardStats = asyncHandler(async (req: jwtReq, res: Response) => {
+    const userId = req.user.id;
+    const response = await handleGetUserDashboardStats(userId);
+    return res.status(200).json({
+        success: true,
+        data: response,
+    });
+});
