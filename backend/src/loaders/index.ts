@@ -6,12 +6,12 @@ import { loadGoogleOAuthClient } from './googleOAuth';
 
 export default async ({
     expressApp
-} : {
-    expressApp : Express.Application;
-}) : Promise<void> => {
+}: {
+    expressApp: Express.Application;
+}): Promise<void> => {
     await getDrizzleClient();
     logger.info('🛡️  Database loaded  🛡️')
-    express({ app : expressApp })
+    express({ app: expressApp })
     logger.info('🛡️  Express loaded  🛡️');
     await loadGoogleOAuthClient();
     logger.info('🛡️  Google OAuth loaded  🛡️')

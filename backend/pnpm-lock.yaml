@@ -95,6 +95,9 @@ importers:
       rate-limiter-flexible:
         specifier: ^7.2.0
         version: 7.4.0
+      tsx:
+        specifier: ^4.20.6
+        version: 4.21.0
       unique-username-generator:
         specifier: ^1.5.1
         version: 1.5.1
@@ -138,9 +141,6 @@ importers:
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@24.12.2)(typescript@5.9.3)
-      tsx:
-        specifier: ^4.20.6
-        version: 4.21.0
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
